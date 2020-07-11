@@ -1,10 +1,11 @@
+all_objects = {}
 class Object():
     """Model an object in-game"""
-    def __init__(self, object_dict, slug, description, can_pickup=True):
+    def __init__(self, all_objects, slug, description, can_pickup=True):
         self.slug = slug
         self.description = description
         self.can_pickup = can_pickup
-        object_dict[self.slug] = self
+        all_objects[self.slug] = self
 
     def look_object(self, player_inventory, current_room):
         if self.slug in current_room.room_inventory.keys():
@@ -34,8 +35,8 @@ class Object():
 
 class Door(Object):
     """Model an door or other portal in-game"""
-    def __init__(self, object_dict, slug, description, locked=False, can_pickup=False):
-        super().__init__(slug, object_dict, description, can_pickup=False)
+    def __init__(self, all_objects, slug, description, locked=False, can_pickup=False):
+        super().__init__(slug, all_objects, description, can_pickup=False)
         self.locked = locked
     
 class Room():

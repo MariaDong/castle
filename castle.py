@@ -5,13 +5,13 @@ player_inventory = {}
 player_map = {}
 current_room = ''
 Rooms = []
-object_dict = {}
 """The current_room variable tracks what room the player is in."""
 
 # Import modules to model rooms and objects.
 from class_models import Room
 from class_models import Object
 from time import sleep
+from class_models import all_objects
 
 # Import inital starting room
 from rooms import living_room
@@ -51,7 +51,7 @@ while True:
     if len(player_choice) == 1 and verb == 'look':
         noun = input(f'{verb.title()} at what?\t')
         if noun in current_room.room_inventory.keys():
-            object_dict[noun].look_object()
+            all_objects[noun].look_object(player_inventory, current_room)
     elif len(player_choice) == 1 and verb in ['use','take']:
         noun = input(f"What do you want to {verb}?\t")
         if verb == 'take':
