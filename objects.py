@@ -1,6 +1,7 @@
 '''A file containing all of the in-game objects.'''
 
 from class_models import Object
+all_objects = {}
 
 # The Object class. Default values for this have been provided below and can be
 # copy-pasted and then uncommented as need.
@@ -18,7 +19,7 @@ from class_models import Object
 #         ):
 
 candle = Object(
-    object_dict,
+    all_objects,
     'candle',
     "It's a small, red taper, about an inch long. It appears brand new.",
     use_with = 'candle',
@@ -31,6 +32,7 @@ candle = Object(
     )
 
 match = Object(
+    all_objects,
     'match',
     """A solitary match. The head is white, which you haven't seen in a while.
     It reminds you of the stories of men and women going mad from phosophorus

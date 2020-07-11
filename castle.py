@@ -1,11 +1,10 @@
 """A simple text adventure game"""
 
 #Initialize dictionaries, lists, etc., that are needed for our game to function.
-player_inventory = {}
-player_map = {}
-current_room = ''
-Rooms = []
-object_dict = {}
+player_inventory = {},
+player_map = {},
+current_room = '',
+Rooms = [],
 """The current_room variable tracks what room the player is in."""
 
 # Import modules to model rooms and objects.
@@ -23,7 +22,6 @@ from objects import match
 # Stage objects
 living_room.stage_item([candle, match])
 candle.look_object(player_inventory, current_room)
-<<<<<<< HEAD
 print("Attempt to pickup the candle.")
 candle.pickup_object(player_inventory, current_room)
 print("Here is the player's new inventory.")
@@ -37,9 +35,6 @@ living_room.room_inventory()
 candle.pickup_object(current_room, player_inventory)
 print("Attempt to use candle alone.")
 candle.use_object(current_room, player_inventory)
-=======
-current_room.print_inventory()
->>>>>>> 4ee3736b6b91e10134ddbca06f351c74c7f022f1
 
 print("")
 # You could store the candle object in a dict with the string 'candle' as the key? Then do dict[choice].look_object()
@@ -68,7 +63,7 @@ while True:
     if len(player_choice) == 1 and verb == 'look':
         noun = input(f'{verb.title()} at what?\t')
         if noun in current_room.room_inventory.keys():
-            object_dict[noun].look_object()
+            all_objects[noun].look_object()
     elif len(player_choice) == 1 and verb in ['use','take']:
         noun = input(f"What do you want to {verb}?\t")
         if verb == 'take':

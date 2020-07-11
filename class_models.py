@@ -1,8 +1,8 @@
 class Object():
     """Model an object in-game"""
     def __init__(
-        object_dict
         self, 
+        all_objects,
         slug, 
         description, 
         can_pickup=True,
@@ -13,7 +13,6 @@ class Object():
         updated_description_alone = '',
         updated_description_with = '',
         ):
-
         self.slug = slug
         self.description = description
         self.can_pickup = can_pickup
@@ -23,7 +22,7 @@ class Object():
         self.use_with = use_with
         self.use_with_text = use_with_text
         self.updated_description_with = updated_description_with
-        object_dict[self.slug] = self
+        all_objects[self.slug] = self
         
     def look_object(self, player_inventory, current_room):
         if self.slug in current_room.room_inventory.keys():
@@ -72,8 +71,8 @@ class Object():
 
 class Door(Object):
     """Model an door or other portal in-game"""
-    def __init__(self, object_dict, slug, description, locked=False, can_pickup=False):
-        super().__init__(slug, object_dict, description, can_pickup=False)
+    def __init__(self, all_objects, slug, description, locked=False, can_pickup=False):
+        super().__init__(slug, all_objects, description, can_pickup=False)
         self.locked = locked
     
 class Room():
@@ -96,18 +95,9 @@ class Room():
         else: 
             print("You can't see that room from here.")
     
-<<<<<<< HEAD
-    def stage_item(self, object_list = []):
-        for item in object_list:
-            self.room_inventory[item.slug] = item.__dict__
-=======
-    def stage_item(self, item):
-        self.room_inventory[item.slug] = item.__dict__
+    def stage_item(self, staged):
+        self.room_inventory[staged.slug] = item.__dict__
     
     def print_inventory(self):
         print(self.room_inventory)
->>>>>>> 4ee3736b6b91e10134ddbca06f351c74c7f022f1
-
-    def print_inventory(self):
-        print(self.room_inventory.keys())
 
