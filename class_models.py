@@ -1,10 +1,11 @@
 class Object():
     """Model an object in-game"""
-    def __init__(self, slug, description, can_pickup=True):
+    def __init__(self, object_dict, slug, description, can_pickup=True):
         self.slug = slug
         self.description = description
         self.can_pickup = can_pickup
-        
+        object_dict[self.slug] = self
+
     def look_object(self, player_inventory, current_room):
         if self.slug in current_room.room_inventory.keys():
             print(self.description)
@@ -33,8 +34,8 @@ class Object():
 
 class Door(Object):
     """Model an door or other portal in-game"""
-    def __init__(self, slug, description, locked=False, can_pickup=False):
-        super().__init__(slug, description, can_pickup=False)
+    def __init__(self, object_dict, slug, description, locked=False, can_pickup=False):
+        super().__init__(slug, object_dict, description, can_pickup=False)
         self.locked = locked
     
 class Room():
@@ -57,7 +58,10 @@ class Room():
         else: 
             print("You can't see that room from here.")
     
-    def stage_item(self, Object):
-        self.room_inventory[Object.slug] = Object.__dict__
+    def stage_item(self, item):
+        self.room_inventory[item.slug] = item.__dict__
+    
+    def print_inventory(self):
+        print(self.room_inventory)
 
 
