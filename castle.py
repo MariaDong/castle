@@ -19,19 +19,23 @@ from rooms import living_room
 current_room = living_room
 # Create objects to stage in room.
 from objects import candle
+from objects import match
 # Stage objects
-living_room.stage_item(candle)
+living_room.stage_item([candle, match])
 candle.look_object(player_inventory, current_room)
 print("Attempt to pickup the candle.")
 candle.pickup_object(player_inventory, current_room)
 print("Here is the player's new inventory.")
 print(player_inventory)
 print("Here is the current room's inventory.")
-print(living_room.room_inventory())
+living_room.room_inventory()
 print("Now you drop the candle.")
 candle.drop_object(player_inventory, current_room)
 print("And here is the current room inventory:")
-print(current_room.room_inventory)
+living_room.room_inventory()
+candle.pickup_object(current_room, player_inventory)
+print("Attempt to use candle alone.")
+candle.use_object(current_room, player_inventory)
 
 print("")
 # You could store the candle object in a dict with the string 'candle' as the key? Then do dict[choice].look_object()

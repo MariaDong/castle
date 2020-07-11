@@ -1,9 +1,27 @@
 class Object():
     """Model an object in-game"""
-    def __init__(self, slug, description, can_pickup=True):
+    def __init__(
+        self, 
+        slug, 
+        description, 
+        can_pickup=True,
+        use_alone=False,
+        use_alone_text = '', 
+        use_with='',
+        use_with_text='',
+        updated_description_alone = '',
+        updated_description_with = '',
+        ):
+
         self.slug = slug
         self.description = description
         self.can_pickup = can_pickup
+        self.use_alone = use_alone
+        self.use_alone_text = use_alone_text
+        self.updated_description_alone = updated_description_alone
+        self.use_with = use_with
+        self.use_with_text = use_with_text
+        self.updated_description_with = updated_description_with
         
     def look_object(self, player_inventory, current_room):
         if self.slug in current_room.room_inventory.keys():
@@ -30,6 +48,25 @@ class Object():
             print(f"Your drop the {self.slug} on the ground.")
             current_room.room_inventory[self.slug] = self.__dict__
             del player_inventory[self.slug]
+    
+    def use_object(self, player_inventory, current_room):
+        if self.can_pickup == True and self.slug not in player_inventory.keys():
+            print(f"You're not holding a {self.slug}")
+        elif self.can_pickup == False and self.slug not in current_room.room_inventory.keys():
+            print(f"You don't see a {self.slug}.")
+        elif self.use_alone == False:
+            use_choice = input('What do you want to use this on?')
+            if use_choice == self.use_with.Object.slug:
+                print(self.use_with_text)
+            if self.updated_description_with:
+                self.description = self.updated_description_with
+            if self.use_with.Object.updated_description_with:
+                self.use_with.Object.description = self.use_with.Object.updated_description_with
+                
+        else:
+            print(self.use_alone_text)
+            if self.updated_description_alone:
+                self.description = self.updated_description_alone
 
 class Door(Object):
     """Model an door or other portal in-game"""
@@ -57,7 +94,10 @@ class Room():
         else: 
             print("You can't see that room from here.")
     
-    def stage_item(self, Object):
-        self.room_inventory[Object.slug] = Object.__dict__
+    def stage_item(self, object_list = []):
+        for item in object_list:
+            self.room_inventory[item.slug] = item.__dict__
 
+    def print_inventory(self):
+        print(self.room_inventory.keys())
 
