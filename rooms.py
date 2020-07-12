@@ -1,7 +1,12 @@
 from class_models import Room
 
-living_room = Room(
-    'living room', 
-    'You enter a small living room.',
+stoop = Room(
+    'stoop',
+    'You find yourself standing outside on a stoop.',
+    'stoop description'
+)
+parlor = Room(
+    'parlor', 
+    'You enter a small parlor.',
     'The living room is richly upholstered with many pieces of furniture. A small candle sits on a table.',
 )
