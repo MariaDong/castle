@@ -6,6 +6,7 @@ class Object():
         # An abbreviated name for the object.
         description,
         # Description given during 'look' method.
+        text_in_room = '',
         can_pickup=True,
         # Specifies whether the object can be picked up.
         use_with='',
@@ -25,6 +26,7 @@ class Object():
         self.use_text = use_text
         self.updated_description = updated_description
         self.cant_pickup_text = cant_pickup_text
+        self.text_in_room = text_in_room
         """Initializes an instance of class Object. Must provide a slug
         name and the object's descript for the 'look' function. Objects
         can be picked up by default."""
@@ -57,11 +59,11 @@ class Object():
             player_inventory[self.slug] = self.__dict__
             del current_room.room_inventory[self.slug]
     
-    # def drop_object(self, player_inventory, current_room):
-    #     if self.slug in player_inventory.keys():
-    #         print(f"Your drop the {self.slug} on the ground.")
-    #         current_room.room_inventory[self.slug] = self.__dict__
-    #         del player_inventory[self.slug]
+    def drop_object(self, player_inventory, current_room):
+        if self.slug in player_inventory.keys():
+            print(f"Your drop the {self.slug} on the ground.")
+            current_room.room_inventory[self.slug] = self.__dict__
+            del player_inventory[self.slug]
     
     # def check_object(self, player_inventory, current_room):
     #     if self.can_pickup == True and self.slug not in player_inventory.keys():
@@ -101,13 +103,19 @@ class Room():
     def look_room(self, current_room):
         if current_room == self:
             print(self.description)
+            # for item in self.room_inventory.objects():
+            #     print[item.slug]
         else: 
             print("You can't see that room from here.")
     
-    def stage_item(self, staged=[]):
+    def stage_item(self, all_objects, staged=[]):
         for stage in staged:
+            all_objects[stage.slug] = stage
             self.room_inventory[stage.slug] = stage.__dict__
     
     def print_inventory(self):
         print(self.room_inventory.keys())
+    
+    def print_inventory_long(self):
+        print(self.room_inventory.items())
 
