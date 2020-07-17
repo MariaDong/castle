@@ -47,16 +47,22 @@ while True:
     # Sanitize input:
     # Remove whitespace and split the choice string into a lowercase list.
     player_choice = choice.strip().lower().split()
-    # Delete 'up', 'at', 'with', 'on', to make player_choice list easier
+    # Delete 'up', 'at', 'with', 'on', 'the', to make player_choice list easier
     # to process.
-    if 'up' in player_choice:
-        player_choice.remove('up')
-    if 'at' in player_choice:
-        player_choice.remove('at')
-    if 'with' in player_choice:
-        player_choice.remove('with')
-    if 'on' in player_choice:
-        player_choice.remove('on')
+    remove_from_choices = ['up', 'at', 'with', 'on', 'the']
+    for word in remove_from_choices:
+        if word in player_choice:
+            player_choice.remove(word)
+    # if 'up' in player_choice:
+    #     player_choice.remove('up')
+    # if 'at' in player_choice:
+    #     player_choice.remove('at')
+    # if 'with' in player_choice:
+    #     player_choice.remove('with')
+    # if 'on' in player_choice:
+    #     player_choice.remove('on')
+    # if 'the' in player_choice:
+    #     player_choice.remove('the')
     # Assign first item in player_choice to the 'verb' variable, then execute commands.
     verb = player_choice[0]
     # COMMAND TREE:
@@ -138,6 +144,16 @@ while True:
                 all_objects[noun].drop_object(player_inventory, current_room)
             except:
                 print(f"I don't know what \"{noun}\" means.")
+    # The use object command requires two objects that are used together.
+    # Each object is first checked with the check_object method to make sure
+    # is it being held by the player and it is something that can be used.
+    # elif verb =='use':
+    #     if len(player_choice) > 3:
+    #         print(try_again)
+    #     elif len(player_choice) == 1:
+    #         first_noun = input ('Use what?')
+    #         first_check = all_objects[noun].
+
 
     # The following commands are for troubleshooting only.
     elif verb == 'inventory_long':

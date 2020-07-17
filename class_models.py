@@ -7,6 +7,7 @@ class Object():
         description,
         # Description given during 'look' method.
         text_in_room = '',
+        # Text added to room description
         can_pickup=True,
         # Specifies whether the object can be picked up.
         use_with='',
@@ -21,6 +22,7 @@ class Object():
         ):
         self.slug = slug
         self.description = description
+        self.text_in_room = text_in_room
         self.can_pickup = can_pickup
         self.use_with = use_with
         self.use_text = use_text
@@ -64,23 +66,25 @@ class Object():
             print(f"Your drop the {self.slug} on the ground.")
             current_room.room_inventory[self.slug] = self.__dict__
             del player_inventory[self.slug]
+        else:
+            print(f"You're not a {self.slug}.")
     
-    # def check_object(self, player_inventory, current_room):
-    #     if self.can_pickup == True and self.slug not in player_inventory.keys():
-    #         print(f"You're not holding a {self.slug}")
-    #     elif self.can_pickup == False and self.slug not in current_room.room_inventory.keys():
-    #         print(f"You don't see a {self.slug}.")
-    #     else:
-    #         pass
-        # elif self.use_alone == False:
-        #     use_choice = input('What do you want to use this on?')
-        #     if use_choice == self.use_with.Object.slug:
-        #         print(self.use_with_text)
-        #     if self.updated_description_with:
-        #         self.description = self.updated_description_with
-        #     if self.use_with.Object.updated_description_with:
-        #         self.use_with.Object.description = self.use_with.Object.updated_description_with
-        #         self.description = self.updated_description_alone
+    def check_object(self, player_inventory, current_room):
+        if self.can_pickup == True and self.slug not in player_inventory.keys():
+            print(f"You're not holding a {self.slug}")
+        elif self.can_pickup == False and self.slug not in current_room.room_inventory.keys():
+            print(f"You don't see a {self.slug}.")
+        else:
+            return True
+    
+    def use_object(self, paired):
+        print(self.use_text)
+        if self.updated_description:
+            self.description = self.updated_description
+    
+    def use_with_object(self):
+        if self.updated_description:
+            self.description = self.updated_description
 
 # class Door(Object):
 #     """Model an door or other portal in-game"""
@@ -102,9 +106,10 @@ class Room():
     
     def look_room(self, current_room):
         if current_room == self:
-            print(self.description)
-            # for item in self.room_inventory.objects():
-            #     print[item.slug]
+            room_description = self.description
+            for item in self.room_inventory:
+                room_description += f" {(self.room_inventory[item]['text_in_room'])} "
+            print(room_description)
         else: 
             print("You can't see that room from here.")
     

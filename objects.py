@@ -2,6 +2,7 @@ from class_models import Object
 candle = Object(
     'candle',
     "It's a small, red taper, about an inch long. It appears brand new.",
+    "There's a candle in the center of the table.",
     use_with = 'candle',
     use_text = """The match flares to life. You hold it to the tip of the
     candle. After a moment, the room fills with an odd scent, earthy and floral
