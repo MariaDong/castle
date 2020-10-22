@@ -27,21 +27,16 @@ match = Object(
     """A solitary match. The head is white, which you haven't seen in a while.
     It reminds you of the stories of men and women going mad from phosophorus
     poisoning, but it's the only match you can see.""",
-    "You think you see a match."
+    "You think you see a match.",
     can_pickup = True,
     can_use = True,
-    use_with = 'candle',
-    use_text = """The match flares to life. You hold it to the tip of the
-    candle. After a moment, the room fills with an odd scent, earthy and floral
-    and just a bit like hot metal. It's unnerving, and you wonder what the 
-    thing is made out of.""",
     updated_description="""A burnt-out match. It's worthless."""
 )
 
 bell = Object (
     'bell',
     """A small, golden bell.""",
-    "There's a bell on the floor."
+    "There's a bell on the floor.",
     can_pickup = True,
     can_use = True,
     use_alone = True,

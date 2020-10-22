@@ -1,3 +1,40 @@
+from inspect import currentframe
+
+def get_linenumber():
+    cf = currentframe()
+    return cf.f_back.f_lineno
+
+class Player():
+    """Model the player in-game"""
+    def __init__(self, name='', inventory=[], entered =[]):
+        self.name = name
+        self.inventory = inventory
+        self.entered = entered
+
+    def enter_room(self, room):
+        self.current_room = room
+        if room not in self.entered:
+            print(f"\n\t{room.entry_text}")
+            self.entered.append(room)
+        else:
+            print(f"\n\tYou are back in the {self.current_room}.")
+    
+    def get_name(self):
+        if self.name == '':
+            self.name = input('Hello, player. What is your name?')
+        else:
+            print(self.name)
+    
+    def look_room(self):
+        print(f"\n\t{self.current_room.description}")
+        for item in self.current_room.room_inventory:
+            print(f"\n\t{item.text_in_room}")    
+
+    def __str__(self):
+        return 'player'
+
+player = Player()
+
 class Object():
     """Model an object in-game"""
     def __init__(
@@ -43,46 +80,77 @@ class Object():
         self.cant_pickup_text = cant_pickup_text
         self.text_in_room = text_in_room
 
-
     def __str__(self):
         return self.slug
         
-    def look_object(self, player_inventory, current_room):
+    def look_object(self):
         print(f"\n\t{self.description}")
     
-    def pickup_object(self, player_inventory, current_room):
+    def pickup_object(self, player):
         """Checks if object is available to be picked up; if so, adds to
         player_inventory and removed from room_inventory."""
         if self.can_pickup == False:
-            print(self.cant_pickup_text)
-        elif self in player_inventory:
-            print(f"The {self.slug} is already in your inventory.")
+            print(f"\n\t{self.cant_pickup_text}")
+        elif self in player.inventory:
+            print(f"\n\tThe {self.slug} is already in your bag.")
         else:
-            print(f"You put the {self.slug} into your inventory.")
-            player_inventory.append(self)
-            current_room.room_inventory.remove(self)
+            print(f"\n\tYou put the {self.slug} into your bag.")
+            player.inventory.append(self)
+            player.current_room.room_inventory.remove(self)
     
-    def drop_object(self, player_inventory, current_room):
-        if self in player_inventory:
+    def drop_object(self, player):
+        """Checks if the object is in player_inventory, drops the 
+        object into room inventory, and changes text_in_room."""
+        if self in player.inventory:
             print(f"\n\tYou drop the {self.slug} on the ground.")
-            current_room.room_inventory.append(self)
-            player_inventory.remove(self)
-            self.text_in_room = f"There is a {self.slug} on the ground."
+            player.current_room.room_inventory.append(self)
+            player.inventory.remove(self)
+            self.text_in_room = f" There is a {self.slug} on the ground."
     
-    def use_object(self, current_room, paired=''):
-        if not paired:
-            if self.use_alone = True:
-                if 
-                print(self.use_text)
-        if paired == self.use_with
-        print(self.use_text)
+    def use_it_alone(self, player):
+        """Tries to use the object by itself."""
+        if self.can_use == False:
+            print(f"\n\tYou're not sure how to use a {self.slug} right now.")
+        elif self.use_alone == False:
+            print(f"\n\tYou're not sure what to do with a {self.slug} right now. Maybe "
+            "this object has to be used with something else.")
+        elif self.only_in_room:
+            if player.current_room.slug != self.only_in_room[0]:
+                print(f"\n\t{self.use_text}")
+            else:
+                print(f"\n\t{self.only_in_room[1]}")
+                self.used = True
+                if self.updated_description:
+                    self.description = self.updated_description
+        else: print(f"Uh oh, something went wrong: {get_linenumber()}.")
     
-    def used_with(self,paired):
-        print(self.use_text)
+    def use_together(self, paired, player):
+        """Try to use the object with another object."""
+        if self.can_use == False:
+            print(f"\n\tYou're not sure how to use these right now.")
+        elif self.use_alone == True:
+            print(f"\n\tYou're not sure how these go together.")
+        elif self.use_with != paired.slug:
+            print(f"\n\tYou're not sure how these go together.")
+        elif self.used == True:
+            print(f"\n\tThe {self.slug} is already all used up.")
+        elif self.use_with == paired.slug:
+            print(f"\n\t{self.use_text}")
+            self.used = True
+            if self.updated_description:
+                self.description = self.updated_description
+            return True
+        elif self.use_with != paired.slug:
+            return False
+
+
+        else: print(f"Uh oh, something went wrong: {get_linenumber()}.")
     
-    # def use_with_object(self):
-    #     if self.updated_description:
-    #         self.description = self.updated_description
+    def use_paired(self):
+        """Alter the paired object if the main object is used."""
+        self.used = True
+        if self.updated_description:
+            self.description = self.updated_description
 
 # class Door(Object):
 #     """Model an door or other portal in-game"""
@@ -92,34 +160,17 @@ class Object():
     
 class Room():
     """Model for a room or area tile in-game"""
-    def __init__(self, slug, entry_text, description, room_inventory=[]):
+    def __init__(self, slug, description='', entry_text='',  
+    room_inventory=[], entered=False,):
         self.slug = slug
-        self.entry_text = entry_text
         self.description = description
+        self.entry_text = entry_text
         self.room_inventory = room_inventory
+        self.entered = entered
 
-    def enter_room(self, current_room):
-        print(self.entry_text)
-        current_room = self
-    
-    def look_room(self, current_room):
-        if current_room == self:
-            room_description = self.description
-            for item in self.room_inventory:
-                room_description += item.text_in_room
-            print(f"\n\t{room_description}")
-        else:
-            print("You can't see that room from here.")
-    
     def stage_item(self, staged=[]):
         for stage in staged:
             self.room_inventory.append(stage)
-    
-    # def print_inventory(self):
-    #     print(self.room_inventory)
-    
-    # def print_inventory_long(self):
-    #     print(self.room_inventory.items())
     
     def __str__(self):
         return self.slug

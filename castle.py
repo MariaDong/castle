@@ -8,16 +8,13 @@ player_map = []
 
 # Import modules to model rooms and objects.
 from time import sleep
-from class_models import Object
-from class_models import Room
-
-# Import the rooms used in the game.
+from class_models import *
 from rooms import *
-current_room = parlor
+
 # Import the objects used in the game.
 from objects import *
 # Call stage item method to move objects to the correct rooms.
-parlor.stage_item(staged=[candle, match])
+parlor.stage_item(staged=[candle, match, bell])
 
 # Initialize stock messages used in while loop - these are constant and do not
 # change through the game.
@@ -27,11 +24,21 @@ inventory_message +="examine any of them closer."
 help_message = """\n\tHere is a list of commands you can use: MAP, INVENTORY, 
 LOOK, TAKE, USE."""
 
+
+# # Greet the player.
+# print("Hi, Player!")
+# # # Get the player's name.
+# player.get_name()
+# # Orient the reader to available commands:
+# print("Intro text or something.")
+
+player.enter_room(parlor)
+
 # The get_command function asks the player what they want to do and sanitizes
-# the input so that it can be processed by the while loop.
+# the input so that it can be processed by the main game loop.
 
 def get_command():
-    """Asks the player for their next move."""
+    """Asks the player for their next move and sanitizes the input."""
     # Prompt player for a command and store as a string.
     choice = input('\nWhat do you want to do?\t\t')
     # Sanitize input:
@@ -61,7 +68,7 @@ def get_command():
         return [verb, noun]
     elif verb == 'use':
         if len(player_choice) == 1:
-            noun = input("Use what?")
+            noun = input("\n\tUse what?\t")
             return [verb, noun]
         elif len(player_choice) == 2:
             noun = player_choice[1]
@@ -73,20 +80,20 @@ def get_command():
         else:
             print(try_again)
     else:
-        print(try_again)
-
-# Greet the player.
+        return 'mistaken'
 
 # Start the main game loop.
 while True:
     choice = get_command()
     if choice[0] == 'inventory':
         print(inventory_message)
-        if not player_inventory:
+        if not player.inventory:
             print("\tYou don't have anything in your inventory.")
         else:
-            for item in player_inventory:
-                print(item)
+            item_list = []
+            for item in player.inventory:
+                item_list.append(item.slug.title())
+                print(f"\n\t{item_list}")
 
     # If the player chooses 'help', a list of commands is printed.
     elif choice[0] == 'help':
@@ -101,75 +108,90 @@ while True:
     # and call the look_object method on the object. If the object is 
     # not found, report that the player cannot see it.
 
-    elif choice[0] == 'look' or choice[0] == 'examine':
-        if choice[1] == 'room' or choice[1] == current_room.slug:
-            current_room.look_room(current_room)
+    if choice[0] == 'look' or choice[0] == 'examine':
+        if choice[1] == 'room' or choice[1] == player.current_room.slug:
+            player.look_room()
         else:
             found_item = False
-            for item in player_inventory + current_room.room_inventory:
+            for item in player.inventory + player.current_room.room_inventory:
                 if item.slug == choice[1]:
                     found_item = True
-                    item.look_object(player_inventory, current_room)
+                    item.look_object()
             if found_item == False:
                     print(f"You don't see a {choice[1]}.")
 
-    # The take command behaves in a similar fashion and executes the
-    # pickup_object method from Object instance.
+# The take command behaves in a similar fashion and executes the
+# pickup_object method from Object and adds to player inventory.
 
     elif choice[0] == 'take' or choice[0] == 'pick' or choice[0] == 'pickup':
         found_item = False
-        for item in player_inventory + current_room.room_inventory:
+        for item in player.inventory + player.current_room.room_inventory:
             if item.slug == choice[1]:
                 found_item = True
-                item.pickup_object(player_inventory, current_room)
+                item.pickup_object(player)
         if found_item == False:
                 print(f"\n\tYou don't see a {choice[1]}.")
 
-    # The drop command works the same, executing the drop_object method.
+# The drop command works the same, executing the drop_object method.
 
     elif choice[0] == 'drop':
         found_item = False
-        for item in player_inventory:
+        for item in player.inventory:
             if item.slug == choice[1]:
                 found_item = True
-                item.drop_object(player_inventory, current_room)
-        if found_item != True:
+                item.drop_object(player)
+        if found_item == False:
                 print(f"\n\tYou're not holding a {choice[1]}.")
 
+# The 'use' command triggers a series of actions depending on how many
+# nouns were entered.
 
-#     # The use object command requires two objects that are used together.
-#     # Each object is first checked with the check_object method to make sure
-#     # is it being held by the player and it is something that can be used.
-#     elif verb =='use':
-#         if len(player_choice) > 3:
-#             print(try_again)
-#         elif len(player_choice) == 1:
-#             first_noun = input ('Use what?')
-#             second_noun = input ('With What?')
-#         elif len(player_choice) == 2:
-#             second_noun = input ('With What?')
-
-
-#             # if first_noun in all_objects.keys():
-#             #     second_noun = input ('With What?'):
-#             #     if second_noun in all_objects.keys():
-
-#     # The following commands are for troubleshooting only.
-#     elif verb == 'inventory_long':
-#         print(player_inventory)
-#     elif verb == 'room_inventory':
-#         current_room.print_inventory()
-#     elif verb == 'room_inventory_long':
-#         current_room.print_inventory_long()
-#     # Finally, an 'else' to capture any misunderstood commands.
-#     else:
-#         print(try_again)
-
-
-#     # elif len(player_choice) == 2:
-#     #     verb = player_choice[0]
-#     #     noun = player_choice[1]
-
-# # print(player_choice)
-# # objects[choice].look_object(current_room)
-
+    elif choice[0] == 'use':
+        # If player has only entered one noun to use, check if item is 
+        # available, and if so, run the use_it_alone method from Object.
+        if len(choice) == 2:
+            found_item = False
+            for item in player.inventory + player.current_room.room_inventory:
+                if item.slug == choice[1]:
+                    found_item = True
+                    item.use_it_alone(player)
+            if found_item == False:
+                print(f"\n\tYou don't see a {choice[1]} right now.")
+        # if player has entered 2 nouns, check if items are both available.)
+        elif len(choice) == 3:
+            found_item_1 = False
+            found_item_2 = False
+            for item in player.inventory + player.current_room.room_inventory:
+                if item.slug == choice[1]:
+                    found_item_1 = True
+                    item_1 = item
+                if item.slug == choice[2]:
+                    found_item_2 = True
+                    item_2 = item
+            # Stop if one of the items is missing.
+            if found_item_1 == False:
+                print(f"\n\tYou don't see a {choice[1]}.")
+            elif found_item_2 == False:
+                print(f"\n\tYou don't see a {choice[2]}.")
+            # If both items are present, check for Object.use_text, which 
+            # will indicate which item is the "main item". Use the
+            # use_together method from the object, which will also return
+            # True if the two objects are paired correctly and False if
+            # the objects are not paired correctly. If true, run the
+            # use_paired method on the secondary object to update used
+            # status and descrption.
+            elif item_1 and item_2:
+                pairing = False
+                if item_1.use_text:
+                    pairing = item_1.use_together(item_2, player)
+                    if pairing == True:
+                        item_2.use_paired()
+                else:
+                    pairing = item_2.use_together(item_1, player)
+                    if pairing == True:
+                        item_2.use_paired()
+        else:
+            print("\n\tThese are too many objects to use together.")
+    # establish a pass at end of loop in case no conditions are met.
+    else: 
+        print(try_again)
