@@ -1,49 +1,39 @@
 """A simple text adventure game"""
 
-#Initialize dictionaries, lists, etc., that are needed for our game to function.
-player_inventory = {}
-player_map = {}
-current_room = ''
-"""The current_room variable tracks the player's location."""
-Rooms = {}
-all_objects = {}
-"""This is a global dictionary that stores a copy of all objects and rooms in 
-the game as they're introduced. Class methods for Object class and Room class
-also update this dictionary as objects change, e.g., if a candle is used. This
-simplifies the while loop used to interface with the game; although objects are
-compared with the class-based dictionaries for the current room, descriptions
-are retrieved from the global dictionary and require no conversion."""
+#-----------1.0 INITIALIZE OBJECTS, ROOMS, AND MESSAGES.----------------
+
+# Initialize player variables.
+player_inventory = []
+player_map = []
 
 # Import modules to model rooms and objects.
 from time import sleep
 from class_models import Object
 from class_models import Room
-"""Used to introduce a delay as needed to make information parsing easier."""
 
 # Import the rooms used in the game.
-from rooms import parlor
-# Import the objects used in the game.
-from objects import candle, match
-from objects import test_object
-test_object.add_dict(all_objects)
-# Add objects to lists to be staged.
-parlor_staging = [candle, match]
-# Call stage item method to move objects to room inventories and all_objects.
-parlor.stage_item(all_objects, staged=parlor_staging)
+from rooms import *
 current_room = parlor
+# Import the objects used in the game.
+from objects import *
+# Call stage item method to move objects to the correct rooms.
+parlor.stage_item(staged=[candle, match])
 
 # Initialize stock messages used in while loop - these are constant and do not
 # change through the game.
-try_again = "I don't think I understood that. Maybe tell me a different way?"
-inventory_message = "Here are the things in your inventory. Use LOOK to "
+try_again = "\n\tI don't think I understood that. Maybe tell me a different way?"
+inventory_message = "\n\tHere are the things in your inventory. Use LOOK to "
 inventory_message +="examine any of them closer."
-help_message = """Here is a list of commands you can use: MAP, INVENTORY, LOOK,
-TAKE, USE."""
+help_message = """\n\tHere is a list of commands you can use: MAP, INVENTORY, 
+LOOK, TAKE, USE."""
 
-# Start the main game loop.
-while True:
+# The get_command function asks the player what they want to do and sanitizes
+# the input so that it can be processed by the while loop.
+
+def get_command():
+    """Asks the player for their next move."""
     # Prompt player for a command and store as a string.
-    choice = input('What do you want to do?\t\t')
+    choice = input('\nWhat do you want to do?\t\t')
     # Sanitize input:
     # Remove whitespace and split the choice string into a lowercase list.
     player_choice = choice.strip().lower().split()
@@ -53,124 +43,133 @@ while True:
     for word in remove_from_choices:
         if word in player_choice:
             player_choice.remove(word)
-    # if 'up' in player_choice:
-    #     player_choice.remove('up')
-    # if 'at' in player_choice:
-    #     player_choice.remove('at')
-    # if 'with' in player_choice:
-    #     player_choice.remove('with')
-    # if 'on' in player_choice:
-    #     player_choice.remove('on')
-    # if 'the' in player_choice:
-    #     player_choice.remove('the')
-    # Assign first item in player_choice to the 'verb' variable, then execute commands.
+    # Assign first item in player_choice to the 'verb' variable, then get a 
+    # second parameter ("noun") if needed.
     verb = player_choice[0]
-    # COMMAND TREE:
-    # If verb == 'inventory', a pre-set inventory intro message,
-    # 'inventory_message', is printed. An empty dictionary is created, and
-    # then a for loop appends the dictionary with all of the keys from the
-    # player_inventory dictionary in title case. The list is then 
-    # printed, producing a neatly formatted inventory.
-    if verb == 'inventory':
-        print(inventory_message)
-        formatted_inventory_list = []
-        for item in player_inventory.keys():
-            formatted_inventory_list.append(item.title())
-        print(formatted_inventory_list)
-    # If the player chooses 'help', a list of commands is printed.
-    elif verb == 'help':
-        print(help_message)
-    # If the player chooses 'look', the player is either prompted to provide
-    # the Object they are looking at, or the Object is parsed via its position
-    # in the player_choice list. The object is assigned to 'noun'. If noun = 
-    # 'room', the look_room method is called for the current_room. Otherwise,
-    # 'noun' is used as the key for the global_objects dict to call the 
-    # look_object method for the Object instance. 
-    # # If the player_choice list has too many items (e.g., player typed "look
-    # bell window", the "try_again" string is printed.)
-    elif verb == 'look' or verb == 'examine':
-        if len(player_choice) > 2:
-            print(try_again)
-        elif len(player_choice) == 2:
-            noun = player_choice[1]
-            if noun == 'room':
-                current_room.look_room(current_room)
-            else:
-                try:
-                    all_objects[noun].look_object(player_inventory, current_room)
-                except:
-                    print(f"I don't know what \"{noun}\" means.")
-        elif len(player_choice) == 1:
-            noun = input('Look at what?\t')
-            if noun == 'room':
-                current_room.look_room(current_room)
-            else:
-                try:
-                    all_objects[noun].look_object(player_inventory, current_room)
-                except:
-                    print(f"I don't know what \"{noun}\" means.")
+    one_word_commands=['inventory','help']
+    two_word_commands=['look', 'examine', 'take', 'pick','pickup', 'drop']
+    if verb in one_word_commands:
+        return [verb]
+    elif len(player_choice) == 2 and verb in two_word_commands:
+        noun = player_choice[1]
+        return [verb, noun]
+    elif len(player_choice) == 1 and verb in two_word_commands:
+        if verb in ['look']:
+            noun = input(f"\n\t\t{verb.title()} at what?\t")
         else:
-            pass
-    # The take command behaves in a similar fashion and executes the
-    # pickup_object method from Object instance.
-    elif verb == 'take' or verb == 'pick' or verb == 'pickup':
-        if len(player_choice) > 2:
-            print(try_again)
-        elif len(player_choice) == 1:
-            noun = input('Take what?\t')
-            try: 
-                all_objects[noun].pickup_object(player_inventory, current_room)
-            except:
-                print(f"I don't know what \"{noun}\" means.")
+            noun = input(f"\n\t\t{verb.title()} what?\t")
+        return [verb, noun]
+    elif verb == 'use':
+        if len(player_choice) == 1:
+            noun = input("Use what?")
+            return [verb, noun]
         elif len(player_choice) == 2:
             noun = player_choice[1]
-            try: 
-                all_objects[noun].pickup_object(player_inventory, current_room)
-            except:
-                print(f"I don't know what \"{noun}\" means.")
-    # The drop commands executes drop_object method from Object instance.
-    elif verb == 'drop':
-        if len(player_choice) > 2:
-            print(try_again)
-        elif len(player_choice) == 1:
-            noun = input('Drop what?\t')
-            try: 
-                all_objects[noun].drop_object(player_inventory, current_room)
-            except:
-                print(f"I don't know what \"{noun}\" means.")
-        elif len(player_choice) == 2:
+            return [verb, noun]
+        elif len(player_choice) == 3:
             noun = player_choice[1]
-            try: 
-                all_objects[noun].drop_object(player_inventory, current_room)
-            except:
-                print(f"I don't know what \"{noun}\" means.")
-    # The use object command requires two objects that are used together.
-    # Each object is first checked with the check_object method to make sure
-    # is it being held by the player and it is something that can be used.
-    # elif verb =='use':
-    #     if len(player_choice) > 3:
-    #         print(try_again)
-    #     elif len(player_choice) == 1:
-    #         first_noun = input ('Use what?')
-    #         first_check = all_objects[noun].
-
-
-    # The following commands are for troubleshooting only.
-    elif verb == 'inventory_long':
-        print(player_inventory)
-    elif verb == 'room_inventory':
-        current_room.print_inventory()
-    elif verb == 'room_inventory_long':
-        current_room.print_inventory_long()
-    # Finally, an 'else' to capture any misunderstood commands.
+            noun_2 = player_choice[2]
+            return [verb, noun, noun_2]
+        else:
+            print(try_again)
     else:
         print(try_again)
 
+# Greet the player.
 
-    # elif len(player_choice) == 2:
-    #     verb = player_choice[0]
-    #     noun = player_choice[1]
+# Start the main game loop.
+while True:
+    choice = get_command()
+    if choice[0] == 'inventory':
+        print(inventory_message)
+        if not player_inventory:
+            print("\tYou don't have anything in your inventory.")
+        else:
+            for item in player_inventory:
+                print(item)
 
-# print(player_choice)
-# objects[choice].look_object(current_room)
+    # If the player chooses 'help', a list of commands is printed.
+    elif choice[0] == 'help':
+        print(help_message)
+
+    # If the verb is 'look' or 'examine', check first to see if the
+    # item is 'room' or is the slug from the current room. If so, 
+    # call the look_room method on the current room. If not, set a flag
+    # for found_item to False. Run through the objects in player_inventory
+    # and in the current_room.room_inventory and see if the slugs of any
+    # of the objects match. If they do, set the found_item flag to True
+    # and call the look_object method on the object. If the object is 
+    # not found, report that the player cannot see it.
+
+    elif choice[0] == 'look' or choice[0] == 'examine':
+        if choice[1] == 'room' or choice[1] == current_room.slug:
+            current_room.look_room(current_room)
+        else:
+            found_item = False
+            for item in player_inventory + current_room.room_inventory:
+                if item.slug == choice[1]:
+                    found_item = True
+                    item.look_object(player_inventory, current_room)
+            if found_item == False:
+                    print(f"You don't see a {choice[1]}.")
+
+    # The take command behaves in a similar fashion and executes the
+    # pickup_object method from Object instance.
+
+    elif choice[0] == 'take' or choice[0] == 'pick' or choice[0] == 'pickup':
+        found_item = False
+        for item in player_inventory + current_room.room_inventory:
+            if item.slug == choice[1]:
+                found_item = True
+                item.pickup_object(player_inventory, current_room)
+        if found_item == False:
+                print(f"\n\tYou don't see a {choice[1]}.")
+
+    # The drop command works the same, executing the drop_object method.
+
+    elif choice[0] == 'drop':
+        found_item = False
+        for item in player_inventory:
+            if item.slug == choice[1]:
+                found_item = True
+                item.drop_object(player_inventory, current_room)
+        if found_item != True:
+                print(f"\n\tYou're not holding a {choice[1]}.")
+
+
+#     # The use object command requires two objects that are used together.
+#     # Each object is first checked with the check_object method to make sure
+#     # is it being held by the player and it is something that can be used.
+#     elif verb =='use':
+#         if len(player_choice) > 3:
+#             print(try_again)
+#         elif len(player_choice) == 1:
+#             first_noun = input ('Use what?')
+#             second_noun = input ('With What?')
+#         elif len(player_choice) == 2:
+#             second_noun = input ('With What?')
+
+
+#             # if first_noun in all_objects.keys():
+#             #     second_noun = input ('With What?'):
+#             #     if second_noun in all_objects.keys():
+
+#     # The following commands are for troubleshooting only.
+#     elif verb == 'inventory_long':
+#         print(player_inventory)
+#     elif verb == 'room_inventory':
+#         current_room.print_inventory()
+#     elif verb == 'room_inventory_long':
+#         current_room.print_inventory_long()
+#     # Finally, an 'else' to capture any misunderstood commands.
+#     else:
+#         print(try_again)
+
+
+#     # elif len(player_choice) == 2:
+#     #     verb = player_choice[0]
+#     #     noun = player_choice[1]
+
+# # print(player_choice)
+# # objects[choice].look_object(current_room)
 
