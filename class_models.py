@@ -134,16 +134,14 @@ class Object():
             print(f"\n\tYou're not sure how these go together.")
         elif self.used == True:
             print(f"\n\tThe {self.slug} is already all used up.")
+        elif self.use_with != paired.slug:
+            return False
         elif self.use_with == paired.slug:
             print(f"\n\t{self.use_text}")
             self.used = True
             if self.updated_description:
                 self.description = self.updated_description
             return True
-        elif self.use_with != paired.slug:
-            return False
-
-
         else: print(f"Uh oh, something went wrong: {get_linenumber()}.")
     
     def use_paired(self):

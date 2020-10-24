@@ -189,7 +189,7 @@ while True:
                 else:
                     pairing = item_2.use_together(item_1, player)
                     if pairing == True:
-                        item_2.use_paired()
+                        item_1.use_paired()
         else:
             print("\n\tThese are too many objects to use together.")
     # establish a pass at end of loop in case no conditions are met.
