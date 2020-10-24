@@ -2,22 +2,21 @@
 
 #-----------1.0 INITIALIZE OBJECTS, ROOMS, AND MESSAGES.----------------
 
-# Initialize player variables.
-player_inventory = []
-player_map = []
-
 # Import modules to model rooms and objects.
 from time import sleep
-from class_models import *
-from rooms import *
 
-# Import the objects used in the game.
+#Initialize the player.
+from class_models import Player
+player = Player()
+
+#Initialize the Rooms, Objects, and functions.
+from rooms import *
 from objects import *
 from functions import *
-from staging import *
 
-# Call stage item method to move objects to the correct rooms.
-parlor.stage_item(staged=[candle, match, bell])
+#Stage rooms with objects.
+from staging import rooms_to_stage, items_to_stage
+stage_rooms(rooms_to_stage, items_to_stage)
 
 # Initialize stock messages used in while loop - these are constant and do not
 # change through the game.

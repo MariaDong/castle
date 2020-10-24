@@ -1,11 +1,14 @@
-from inspect import currentframe
+"""This file contains the base design of most of the models used in the
+game."""
 
+# the get_line_number function is used to assist with error tracking.
+from inspect import currentframe
 def get_linenumber():
     cf = currentframe()
     return cf.f_back.f_lineno
 
 class Player():
-    """Model the player in-game"""
+    """A simple representation of the protagonist."""
     def __init__(self, name='', inventory=[], entered =[]):
         self.name = name
         self.inventory = inventory
@@ -33,10 +36,8 @@ class Player():
     def __str__(self):
         return 'player'
 
-player = Player()
-
 class Object():
-    """Model an object in-game"""
+    """A simple representation of an in-game object."""
     def __init__(
         self,
         slug,
@@ -168,7 +169,7 @@ class Room():
         self.room_inventory = room_inventory
         self.entered = entered
 
-    def stage_item(self, staged=[]):
+    def stage_items(self, staged=[]):
         for stage in staged:
             self.room_inventory.append(stage)
     

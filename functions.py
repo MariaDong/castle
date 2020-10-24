@@ -46,7 +46,16 @@ def get_command():
             print(try_again)
     else:
         return 'mistaken'
-        
+
+def stage_rooms(rooms_to_stage, items_to_stage):
+    """Looks in staging.py for a list, rooms_to_stage, and a
+    dictionary of items to stage in each room. Iterates over the list,
+    calling the stage_items method from the Room."""
+    while rooms_to_stage:
+        currently_staging = rooms_to_stage.pop()
+        print(f"Staging the {currently_staging}.")
+        currently_staging.stage_items(staged=items_to_stage[currently_staging])
+
 def player_inventory(player):
     """Prints the contents of the players inventory or advises empty."""
     print(inventory_message)
