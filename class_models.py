@@ -109,7 +109,9 @@ class Object():
     
     def use_it_alone(self, player):
         """Tries to use the object by itself."""
-        if self.can_use == False:
+        if self.used == True:
+            print(f"\n\tYou already used this.")
+        elif self.can_use == False:
             print(f"\n\tYou're not sure how to use a {self.slug} right now.")
         elif self.use_alone == False:
             print(f"\n\tYou're not sure what to do with a {self.slug} right now. Maybe "
