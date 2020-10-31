@@ -56,7 +56,12 @@ def stage_rooms(rooms_to_stage, items_to_stage):
         print(f"Staging the {currently_staging}.")
         currently_staging.stage_items(staged=items_to_stage[currently_staging])
 
-def player_inventory(player):
+def pair_items(paired_items):
+    for key, value in paired_items.items():
+        key.use_with = value
+        value.use_with = key
+
+def player_inventory(player, inventory_message):
     """Prints the contents of the players inventory or advises empty."""
     print(inventory_message)
     if not player.inventory:
@@ -144,12 +149,4 @@ def player_use_two(choice, player):
     # use_paired method on the secondary object to update used
     # status and descrption.
     elif item_1 and item_2:
-        pairing = False
-        if item_1.use_text:
-            pairing = item_1.use_together(item_2, player)
-            if pairing == True:
-                item_2.use_paired()
-        else:
-            pairing = item_2.use_together(item_1, player)
-            if pairing == True:
-                item_1.use_paired()
+        item_1.use_together(item_2, player)

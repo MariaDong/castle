@@ -31,7 +31,8 @@ class Player():
     def look_room(self):
         print(f"\n\t{self.current_room.description}")
         for item in self.current_room.room_inventory:
-            print(f"\n\t{item.text_in_room}")    
+            if item.hidden != True:
+                print(f"\n\t{item.text_in_room}")    
 
     def __str__(self):
         return 'player'
@@ -40,9 +41,9 @@ class Object():
     """A simple representation of an in-game object."""
     def __init__(
         self,
-        slug,
+        slug='',
         # An abbreviated name for the object.
-        description,
+        description='',
         # Description given during 'look' method.
         text_in_room = '',
         # Text added to room description
@@ -66,6 +67,10 @@ class Object():
         # Updated description, needed if object changes after use.
         cant_pickup_text = "You can't pick that up.",
         # Set to a default, can be customized for specific instances.
+        use_once = False,
+        # Destroys the object after use if True.
+        hidden = False,
+        # Sets the item as hidden.
         ):
         self.slug = slug
         self.description = description
@@ -80,7 +85,9 @@ class Object():
         self.updated_description = updated_description
         self.cant_pickup_text = cant_pickup_text
         self.text_in_room = text_in_room
-
+        self.use_once = use_once
+        self.hidden = hidden
+    
     def __str__(self):
         return self.slug
         
@@ -125,18 +132,74 @@ class Object():
                 self.used = True
                 if self.updated_description:
                     self.description = self.updated_description
+                if self.use_once == True:
+                    player.inventory.remove(self)
         else: print(f"Uh oh, something went wrong: {get_linenumber()}.")
     
     def use_together(self, paired, player):
         """Try to use the object with another object."""
         if self.can_use == False:
-            print(f"\n\tYou're not sure how to use these right now.")
-        elif self.use_alone == True:
-            print(f"\n\tYou're not sure how these go together.")
-        elif self.use_with != paired.slug:
-            print(f"\n\tYou're not sure how these go together.")
+            print(f"\n\tYou're not sure how to use a {self.slug} right now.")
+        elif paired.can_use == False:
+            print(f"\n\tYou're not sure how to use a {paired.slug} right now.")
         elif self.used == True:
             print(f"\n\tThe {self.slug} is already all used up.")
+        elif paired.used == True:
+            print(f"\n\tThe {paired.slug} is already all used up.")
+        elif self.use_with != paired:
+            print(f"\n\tYou're not sure how these go together.")
+        elif self.use_with == paired:
+            if self.use_text:
+                print(f"\n\t{self.use_text}")
+            if paired.use_text:
+                print(f"\n\t{paired.use_text}")
+            self.used = True
+            paired.used = True
+            if self.updated_description:
+                self.description = self.updated_description
+            if paired.updated_description:
+                paired.description = paired.updated_description
+            if self.use_once == True:
+                if self in player.inventory:
+                    player.inventory.remove(self)
+                elif self in player.current_room.room_inventory:
+                    player.current_room.room_inventory.remove(self)
+            if paired.use_once == True:
+                if paired in player.inventory:
+                    player.inventory.remove(paired)
+                elif paired in player.current_room.room_inventory:
+                    player.current_room.room_inventory.remove(paired)
+
+        else: print(f"Uh oh, something went wrong: {get_linenumber()}.")
+
+class Door(Object):
+    """Represents a door or exit to a room."""
+    def __init__(self, slug, description, text_in_room, can_pickup, can_use,
+    use_with, use_alone, only_in_room, use_text, used, updated_description, cant_pickup_text, use_once, hidden):
+        """initalize attributes of the parent class"""
+        super().__init__(self, slug, description, text_in_room, can_pickup, can_use,
+        use_with, use_alone, only_in_room, use_text, used, updated_description, cant_pickup_text, use_once, hidden, paired_room)
+        self.locked=True
+        self.visible=False
+        self.can_use=True
+        self.use_alone=True
+        self.paired_room = ''
+
+    def use_it_alone(self, player):
+        """Tries to use the door."""
+        if self.locked == True:
+            print(f"\n\tIt seems like this {self.slug} is locked.")
+        elif self.use_alone == False:
+            print(f"\n\tIt feels like you're missing something here.")
+        else: 
+            player.enter_room(player, self.paired_room)
+
+    def use_together(self, paired, player):
+        """Try to use the door with another object."""
+        if self.can_use == False:
+            print(f"\n\tYou're not sure how to use these right now.")
+        elif self.use_with != paired.slug:
+            print(f"\n\tThis combination doesn't seem to work.")
         elif self.use_with != paired.slug:
             return False
         elif self.use_with == paired.slug:
@@ -146,18 +209,14 @@ class Object():
                 self.description = self.updated_description
             return True
         else: print(f"Uh oh, something went wrong: {get_linenumber()}.")
-    
+
     def use_paired(self):
         """Alter the paired object if the main object is used."""
         self.used = True
         if self.updated_description:
             self.description = self.updated_description
-
-# class Door(Object):
-#     """Model an door or other portal in-game"""
-#     def __init__(self, all_objects, slug, description, locked=False, can_pickup=False):
-#         super().__init__(slug, all_objects, description, can_pickup=False)
-#         self.locked = locked
+        if self.use_once:
+            player.inventory.remove(self)
     
 class Room():
     """Model for a room or area tile in-game"""

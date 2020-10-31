@@ -8,16 +8,15 @@ from class_models import Object
 # use_text, used, updated_description, cant_pickup_text
 
 candle = Object(
-    'candle',
-    "It's a small, red taper, about an inch long. It appears brand new.",
-    "There's a candle in the center of the table.",
+    slug = 'candle',
+    description = "It's a small, red taper, about an inch long. It appears brand new.",
+    text_in_room = "There's a candle in the center of the table.",
     can_pickup = True,
     can_use = True,
-    use_with = 'match',
     use_text = """The match flares to life. You hold it to the tip of the
     candle. After a moment, the room fills with an odd scent, earthy and floral
     and just a bit like hot metal. It's unnerving, and you wonder what the 
-    thing is made out of.""",
+    thing is made out of. The match disappears in a puff of smoke.""",
     updated_description = """It's a small, red taper, about an inch long.
     A tiny flame gutters on the end of it."""
     )
@@ -30,7 +29,7 @@ match = Object(
     "You think you see a match.",
     can_pickup = True,
     can_use = True,
-    updated_description="""A burnt-out match. It's worthless."""
+    use_once = True,
 )
 
 bell = Object (
@@ -40,7 +39,16 @@ bell = Object (
     can_pickup = True,
     can_use = True,
     use_alone = True,
-    use_text= """You ring the bell. The sound bounces through the room, 
-    but nothing happens.""",
+    use_text = "You ring the bell. The sound bounces through the room, but nothing happens.",
     only_in_room = ['stoop', "The door swings open."]
 )
+
+# front_door = Door (
+#     'door',
+#     """A large wooden door.""",
+#     "You see a big wooden door near the opposite wall.",
+#     locked = False,
+#     use_text= """You ring the bell. The sound bounces through the room, 
+#     but nothing happens.""",
+#     only_in_room = ['stoop', "The door swings open."]
+# )

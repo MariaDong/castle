@@ -6,3 +6,7 @@ rooms_to_stage = [parlor]
 items_to_stage = {
     parlor: [match, candle, bell],
 }
+
+paired_items = {
+    match: candle,
+}

@@ -15,8 +15,9 @@ from objects import *
 from functions import *
 
 #Stage rooms with objects.
-from staging import rooms_to_stage, items_to_stage
+from staging import rooms_to_stage, items_to_stage, paired_items
 stage_rooms(rooms_to_stage, items_to_stage)
+pair_items(paired_items)
 
 # Initialize stock messages used in while loop - these are constant and do not
 # change through the game.
@@ -43,12 +44,12 @@ player.enter_room(parlor)
 while True:
     choice = get_command()
     if choice[0] == 'inventory':
-        player_inventory(player)
+        player_inventory(player, inventory_message)
 # If the player chooses 'help', a list of commands is printed.
     elif choice[0] == 'help':
         print(help_message)
 # If the verb is 'look' or 'examine':
-    if choice[0] == 'look' or choice[0] == 'examine':
+    elif choice[0] == 'look' or choice[0] == 'examine':
 # Check to see if the next work is 'room' or the current room.
         if choice[1] == 'room' or choice[1] == player.current_room.slug:
 # If so, run the look_room method from player.
